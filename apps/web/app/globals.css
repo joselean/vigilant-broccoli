@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: #000;
+  color: #f4f5f7;
+}
+
+.text-gradient-glow {
+  background: linear-gradient(90deg, #ffffff, #b9c2ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

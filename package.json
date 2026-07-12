@@ -1,0 +1,17 @@
+{
+  "name": "ultimahost",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev:web": "pnpm --filter @ultimahost/web dev",
+    "dev:bot": "pnpm --filter @ultimahost/bot dev",
+    "build": "pnpm -r build",
+    "db:generate": "pnpm --filter @ultimahost/db prisma:generate",
+    "db:migrate": "pnpm --filter @ultimahost/db prisma:migrate",
+    "db:seed": "pnpm --filter @ultimahost/db prisma:seed"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  },
+  "packageManager": "pnpm@9.6.0"
+}
