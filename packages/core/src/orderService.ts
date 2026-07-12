@@ -1,12 +1,14 @@
 import { prisma } from "@ultimahost/db";
 import { hetznerClient } from "./hetzner";
 import { getPaymentProvider } from "./payments";
+import type { PaymentMethodKind } from "./payments";
 
 export interface CreateOrderInput {
   telegramId: bigint;
   username?: string | null;
   firstName?: string | null;
   planSlug: string;
+  paymentMethod: PaymentMethodKind;
 }
 
 export async function findOrCreateUser(input: {
@@ -46,7 +48,7 @@ export async function createOrder(input: CreateOrderInput) {
     },
   });
 
-  const paymentProvider = getPaymentProvider();
+  const paymentProvider = getPaymentProvider(input.paymentMethod);
   const payment = await paymentProvider.createPayment({
     orderId: order.id,
     amountRub: plan.priceRub,

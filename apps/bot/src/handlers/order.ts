@@ -1,13 +1,38 @@
 import { cancelOrder, config, createOrder } from "@ultimahost/core";
+import type { PaymentMethodKind } from "@ultimahost/core";
 import { InlineKeyboard } from "grammy";
 import type { BotContext } from "../bot";
 import { formatPrice } from "../format";
 
+const PAYMENT_METHOD_LABELS: Record<PaymentMethodKind, string> = {
+  card: "💳 Банковской картой",
+  sbp: "📱 Через СБП",
+  crypto: "🪙 Криптовалютой",
+};
+
+export async function handleChoosePaymentMethod(ctx: BotContext) {
+  await ctx.answerCallbackQuery();
+  const slug = ctx.match?.[1];
+  if (!slug) return;
+
+  const keyboard = new InlineKeyboard()
+    .text(PAYMENT_METHOD_LABELS.card, `buy:${slug}:card`)
+    .row()
+    .text(PAYMENT_METHOD_LABELS.sbp, `buy:${slug}:sbp`)
+    .row()
+    .text(PAYMENT_METHOD_LABELS.crypto, `buy:${slug}:crypto`)
+    .row()
+    .text("« Назад", `plan:${slug}`);
+
+  await ctx.reply("Выберите способ оплаты:", { reply_markup: keyboard });
+}
+
 export async function handleBuyPlan(ctx: BotContext) {
   await ctx.answerCallbackQuery();
   const slug = ctx.match?.[1];
+  const method = ctx.match?.[2] as PaymentMethodKind | undefined;
   const from = ctx.from;
-  if (!slug || !from) return;
+  if (!slug || !method || !from) return;
 
   await ctx.reply("⏳ Оформляем заказ...");
 
@@ -17,11 +42,13 @@ export async function handleBuyPlan(ctx: BotContext) {
       username: from.username ?? null,
       firstName: from.first_name ?? null,
       planSlug: slug,
+      paymentMethod: method,
     });
 
     const lines = [
       `🧾 Заказ #${order.id} создан.`,
       `Тариф: <b>${plan.name}</b>`,
+      `Способ оплаты: ${PAYMENT_METHOD_LABELS[method]}`,
       `Сумма: <b>${formatPrice(order.amountRub)}</b>`,
     ];
 

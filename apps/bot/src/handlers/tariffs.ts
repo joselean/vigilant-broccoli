@@ -32,6 +32,6 @@ export async function handleShowPlanDetails(ctx: BotContext) {
     return;
   }
 
-  const keyboard = new InlineKeyboard().text("✅ Заказать", `buy:${plan.slug}`);
+  const keyboard = new InlineKeyboard().text("✅ Заказать", `pay:${plan.slug}`);
   await ctx.reply(formatPlanDetails(plan), { parse_mode: "HTML", reply_markup: keyboard });
 }

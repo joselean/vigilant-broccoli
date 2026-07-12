@@ -1,17 +1,24 @@
-import { config } from "../config";
+import { config, isPlategaConfigured } from "../config";
 import { cryptoBotPaymentProvider } from "./cryptobot";
 import { manualPaymentProvider } from "./manual";
-import type { PaymentProvider } from "./types";
-import { yookassaPaymentProvider } from "./yookassa";
+import { createPlategaProvider } from "./platega";
+import type { PaymentMethodKind, PaymentProvider } from "./types";
 
-const providers: Record<string, PaymentProvider> = {
-  manual: manualPaymentProvider,
-  yookassa: yookassaPaymentProvider,
-  cryptobot: cryptoBotPaymentProvider,
-};
+/**
+ * Platega — основной агрегатор для карт/СБП/крипты. Для крипты, если Platega
+ * не настроена, используем CryptoBot как альтернативу. Если ничего не
+ * настроено — оплата вручную по реквизитам с подтверждением админом.
+ */
+export function getPaymentProvider(method: PaymentMethodKind): PaymentProvider {
+  if (isPlategaConfigured()) {
+    return createPlategaProvider(method);
+  }
 
-export function getPaymentProvider(): PaymentProvider {
-  return providers[config.paymentProvider] ?? manualPaymentProvider;
+  if (method === "crypto" && config.cryptoBotToken) {
+    return cryptoBotPaymentProvider;
+  }
+
+  return manualPaymentProvider;
 }
 
 export * from "./types";

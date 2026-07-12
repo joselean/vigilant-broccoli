@@ -34,6 +34,11 @@ model Plan {
   cpu               Int
   ramGb             Int
   diskGb            Int
+  /// Себестоимость Hetzner (EUR/мес) — фактическая цена server_type в консоли Hetzner.
+  costEur           Float
+  /// Цена продажи в рублях — считается из costEur по формуле (курс ЦБ * 1.05) * 1.30
+  /// и кэшируется здесь через refreshExchangeRateAndPrices(), чтобы не дёргать
+  /// внешний API курса на каждый показ тарифа.
   priceRub          Int
   locationLabel     String
   hetznerServerType String
@@ -44,6 +49,17 @@ model Plan {
   createdAt         DateTime @default(now())
 
   orders Order[]
+}
+
+/// Кэш последнего известного биржевого курса для пересчёта цен тарифов.
+model ExchangeRate {
+  id        Int      @id @default(autoincrement())
+  base      String
+  quote     String
+  rate      Float
+  updatedAt DateTime @updatedAt
+
+  @@unique([base, quote], name: "base_quote")
 }
 
 model Order {

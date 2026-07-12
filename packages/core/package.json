@@ -4,11 +4,15 @@
   "private": true,
   "main": "src/index.ts",
   "types": "src/index.ts",
+  "scripts": {
+    "refresh-prices": "tsx src/scripts/refreshPrices.ts"
+  },
   "dependencies": {
     "@ultimahost/db": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.5.4",
-    "@types/node": "^20.14.15"
+    "@types/node": "^20.14.15",
+    "tsx": "^4.16.5"
   }
 }

@@ -1,7 +1,7 @@
 import { Bot, Context } from "grammy";
 import { handleAdminConfirm, handleAdminReject } from "./handlers/admin";
 import { handleMyOrders } from "./handlers/myorders";
-import { handleBuyPlan, handleCancelOrder, handleMarkPaid } from "./handlers/order";
+import { handleBuyPlan, handleCancelOrder, handleChoosePaymentMethod, handleMarkPaid } from "./handlers/order";
 import { handleShowTariffs, handleShowPlanDetails } from "./handlers/tariffs";
 import { handleStart, handleSupport, mainMenuKeyboard } from "./handlers/start";
 
@@ -18,7 +18,8 @@ export function createBot(token: string): Bot<BotContext> {
   bot.callbackQuery("menu:support", handleSupport);
 
   bot.callbackQuery(/^plan:(.+)$/, handleShowPlanDetails);
-  bot.callbackQuery(/^buy:(.+)$/, handleBuyPlan);
+  bot.callbackQuery(/^pay:(.+)$/, handleChoosePaymentMethod);
+  bot.callbackQuery(/^buy:([^:]+):(card|sbp|crypto)$/, handleBuyPlan);
   bot.callbackQuery(/^paid:(\d+)$/, handleMarkPaid);
   bot.callbackQuery(/^cancel:(\d+)$/, handleCancelOrder);
   bot.callbackQuery(/^admin_confirm:(\d+)$/, handleAdminConfirm);

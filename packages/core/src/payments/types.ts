@@ -1,3 +1,5 @@
+export type PaymentMethodKind = "card" | "sbp" | "crypto";
+
 export interface PaymentRequest {
   orderId: number;
   amountRub: number;
