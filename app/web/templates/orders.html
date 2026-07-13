@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Заказы — VDS Reseller{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Заказы</h1>
+    <select name="status" hx-get="/orders/" hx-target="#orders-table"
+            class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
+        <option value="">Все статусы</option>
+        {% for s in statuses %}
+        <option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+</div>
+<div id="orders-table">
+    {% include "partials/orders_table.html" %}
+</div>
+{% endblock %}

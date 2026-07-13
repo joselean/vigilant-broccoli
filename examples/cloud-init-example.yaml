@@ -1,0 +1,35 @@
+# Пример user_data (cloud-init), который бот генерирует автоматически
+# при создании сервера (см. app/utils/cloud_init.py).
+#
+# Вариант 1: клиент дал SSH-ключ (пароль не устанавливается, вход по ключу)
+#cloud-config
+hostname: my-server-01
+manage_etc_hosts: true
+package_update: true
+package_upgrade: true
+packages:
+  - htop
+  - fail2ban
+  - ufw
+  - curl
+  - vim
+ssh_authorized_keys:
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... user@laptop          # ключ клиента
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... reseller@master      # мастер-ключ реселлера
+ssh_pwauth: false
+runcmd:
+  - ufw allow OpenSSH
+  - ufw --force enable
+  - systemctl enable --now fail2ban
+
+# ------------------------------------------------------------------
+# Вариант 2: без SSH-ключа — бот генерирует сильный root-пароль
+# и включает парольную аутентификацию:
+#
+# ssh_pwauth: true
+# chpasswd:
+#   expire: false
+#   users:
+#     - name: root
+#       password: "Xk9#mP2vQ8@wL5nR4tYz"
+#       type: text

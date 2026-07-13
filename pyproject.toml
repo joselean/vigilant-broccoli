@@ -1,0 +1,45 @@
+[project]
+name = "vds-reseller-bot"
+version = "1.0.0"
+description = "Telegram bot for reselling VDS/VPS servers (Vultr + Hetzner) with 35% markup"
+requires-python = ">=3.12"
+dependencies = [
+    "aiogram>=3.13",
+    "SQLAlchemy[asyncio]>=2.0.30",
+    "asyncpg>=0.29",
+    "alembic>=1.13",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.9",
+    "itsdangerous>=2.2",
+    "httpx>=0.27",
+    "APScheduler>=3.10",
+    "loguru>=0.7",
+    "cryptography>=42.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

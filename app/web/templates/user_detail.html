@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Пользователь #{{ user.id }} — VDS Reseller{% endblock %}
+{% block content %}
+<a href="/users/" class="text-sm text-indigo-600">← к списку</a>
+<div class="flex items-center justify-between mt-2 mb-6">
+    <h1 class="text-2xl font-bold">{{ user.full_name }} {% if user.username %}<span class="text-slate-400 font-normal">@{{ user.username }}</span>{% endif %}</h1>
+    <form method="post" action="/users/{{ user.id }}/ban"
+          onsubmit="return confirm('{{ 'Разбанить' if user.is_banned else 'Забанить' }} пользователя?')">
+        <button class="px-4 py-2 rounded-lg text-sm font-semibold {% if user.is_banned %}bg-emerald-600 text-white{% else %}bg-red-600 text-white{% endif %}">
+            {{ "Разбанить" if user.is_banned else "Забанить" }}
+        </button>
+    </form>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="bg-white rounded-xl shadow-sm p-5">
+        <h2 class="font-semibold mb-3">Профиль</h2>
+        <dl class="text-sm space-y-2">
+            <div class="flex justify-between"><dt class="text-slate-500">Telegram ID</dt><dd class="font-mono">{{ user.telegram_id }}</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Баланс</dt><dd class="font-bold">{{ user.balance | money }}</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Регистрация</dt><dd>{{ user.created_at.strftime("%d.%m.%Y %H:%M") }}</dd></div>
+            <div class="flex justify-between"><dt class="text-slate-500">Автопродление</dt><dd>{{ "вкл" if user.autorenew_enabled else "выкл" }}</dd></div>
+        </dl>
+        <form method="post" action="/users/{{ user.id }}/balance" class="mt-4 flex gap-2">
+            <input name="amount" type="number" step="0.01" placeholder="+10.00 / -5.00" required
+                   class="border border-slate-300 rounded-lg px-3 py-2 text-sm flex-1">
+            <button class="bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-semibold">Изменить баланс</button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm p-5 lg:col-span-2">
+        <h2 class="font-semibold mb-3">Серверы ({{ servers | length }})</h2>
+        <table class="w-full text-sm">
+            <thead class="text-slate-500 text-left">
+            <tr><th class="py-2">Hostname</th><th>IP</th><th>Провайдер</th><th>Статус</th><th>Истекает</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+            {% for s in servers %}
+            <tr>
+                <td class="py-2 font-mono">{{ s.hostname }}</td>
+                <td class="font-mono">{{ s.main_ip or "—" }}</td>
+                <td>{{ s.provider.value }}</td>
+                <td>{{ s.status.value }}</td>
+                <td>{{ s.expires_at.strftime("%d.%m.%Y") }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="py-4 text-center text-slate-400">Нет серверов</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+    <div class="bg-white rounded-xl shadow-sm p-5">
+        <h2 class="font-semibold mb-3">Заказы</h2>
+        <table class="w-full text-sm">
+            <tbody class="divide-y divide-slate-100">
+            {% for o in orders %}
+            <tr>
+                <td class="py-2">#{{ o.id }}</td>
+                <td>{{ o.plan_label }}</td>
+                <td>{{ o.total_price | money }}</td>
+                <td><span class="text-xs rounded-full px-2 py-0.5 bg-slate-100">{{ o.status.value }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td class="py-4 text-center text-slate-400">Нет заказов</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-5">
+        <h2 class="font-semibold mb-3">Транзакции</h2>
+        <table class="w-full text-sm">
+            <tbody class="divide-y divide-slate-100">
+            {% for t in transactions %}
+            <tr>
+                <td class="py-2 text-slate-500">{{ t.created_at.strftime("%d.%m %H:%M") }}</td>
+                <td>{{ t.type.value }}</td>
+                <td class="font-semibold {% if t.amount > 0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ t.amount | money }}</td>
+                <td class="text-slate-500">{{ t.description }}</td>
+            </tr>
+            {% else %}
+            <tr><td class="py-4 text-center text-slate-400">Нет транзакций</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

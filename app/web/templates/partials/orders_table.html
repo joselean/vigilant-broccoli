@@ -1,0 +1,47 @@
+<div class="bg-white rounded-xl shadow-sm overflow-x-auto">
+    <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-slate-500 text-left">
+        <tr>
+            <th class="px-4 py-3">#</th>
+            <th class="px-4 py-3">Пользователь</th>
+            <th class="px-4 py-3">Провайдер</th>
+            <th class="px-4 py-3">Тариф</th>
+            <th class="px-4 py-3">Период</th>
+            <th class="px-4 py-3">Сумма</th>
+            <th class="px-4 py-3">Статус</th>
+            <th class="px-4 py-3">Создан</th>
+            <th class="px-4 py-3"></th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+        {% for o in orders %}
+        <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3">{{ o.id }}</td>
+            <td class="px-4 py-3"><a class="text-indigo-600" href="/users/{{ o.user_id }}">#{{ o.user_id }}</a></td>
+            <td class="px-4 py-3">{{ o.provider.value }}</td>
+            <td class="px-4 py-3">{{ o.plan_label }}</td>
+            <td class="px-4 py-3">{{ o.months }} мес.</td>
+            <td class="px-4 py-3 font-semibold">{{ o.total_price | money }}</td>
+            <td class="px-4 py-3">
+                {% set colors = {"completed": "bg-emerald-100 text-emerald-700", "failed": "bg-red-100 text-red-700",
+                                 "pending": "bg-amber-100 text-amber-700", "paid": "bg-blue-100 text-blue-700",
+                                 "provisioning": "bg-indigo-100 text-indigo-700"} %}
+                <span class="text-xs rounded-full px-2 py-0.5 {{ colors.get(o.status.value, 'bg-slate-100') }}">{{ o.status.value }}</span>
+                {% if o.error_message %}<div class="text-xs text-red-500 mt-1 max-w-xs truncate" title="{{ o.error_message }}">{{ o.error_message }}</div>{% endif %}
+            </td>
+            <td class="px-4 py-3 text-slate-500">{{ o.created_at.strftime("%d.%m.%Y %H:%M") }}</td>
+            <td class="px-4 py-3">
+                {% if o.status.value in ("failed", "provisioning") %}
+                <form method="post" action="/orders/{{ o.id }}/reprovision"
+                      onsubmit="return confirm('Перезапустить создание сервера по заказу #{{ o.id }}?')">
+                    <button class="text-xs bg-indigo-600 text-white rounded px-2 py-1">↻ Пересоздать</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">Заказов нет</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

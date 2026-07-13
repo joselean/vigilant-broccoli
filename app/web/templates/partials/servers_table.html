@@ -1,0 +1,52 @@
+<div class="bg-white rounded-xl shadow-sm overflow-x-auto">
+    <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-slate-500 text-left">
+        <tr>
+            <th class="px-4 py-3">#</th>
+            <th class="px-4 py-3">Hostname</th>
+            <th class="px-4 py-3">IP</th>
+            <th class="px-4 py-3">Владелец</th>
+            <th class="px-4 py-3">Провайдер</th>
+            <th class="px-4 py-3">Тариф</th>
+            <th class="px-4 py-3">Статус</th>
+            <th class="px-4 py-3">Истекает</th>
+            <th class="px-4 py-3">Действия</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+        {% for s in servers %}
+        <tr class="hover:bg-slate-50">
+            <td class="px-4 py-3">{{ s.id }}</td>
+            <td class="px-4 py-3 font-mono">{{ s.hostname }}</td>
+            <td class="px-4 py-3 font-mono">{{ s.main_ip or "—" }}</td>
+            <td class="px-4 py-3"><a class="text-indigo-600" href="/users/{{ s.user_id }}">#{{ s.user_id }}</a></td>
+            <td class="px-4 py-3">{{ s.provider.value }}</td>
+            <td class="px-4 py-3">{{ s.plan_label }}</td>
+            <td class="px-4 py-3">
+                {% set colors = {"active": "bg-emerald-100 text-emerald-700", "expired": "bg-slate-200 text-slate-600",
+                                 "error": "bg-red-100 text-red-700", "provisioning": "bg-amber-100 text-amber-700"} %}
+                <span class="text-xs rounded-full px-2 py-0.5 {{ colors.get(s.status.value, 'bg-slate-100') }}">{{ s.status.value }}</span>
+            </td>
+            <td class="px-4 py-3 text-slate-500">{{ s.expires_at.strftime("%d.%m.%Y") }}</td>
+            <td class="px-4 py-3">
+                <div class="flex gap-1">
+                    <form method="post" action="/servers/{{ s.id }}/sync">
+                        <button class="text-xs bg-slate-200 rounded px-2 py-1" title="Синхронизировать статус">⟳</button>
+                    </form>
+                    <form method="post" action="/servers/{{ s.id }}/reboot"
+                          onsubmit="return confirm('Перезагрузить {{ s.hostname }}?')">
+                        <button class="text-xs bg-amber-500 text-white rounded px-2 py-1" title="Перезагрузить">↻</button>
+                    </form>
+                    <form method="post" action="/servers/{{ s.id }}/delete"
+                          onsubmit="return confirm('УДАЛИТЬ {{ s.hostname }} безвозвратно?')">
+                        <button class="text-xs bg-red-600 text-white rounded px-2 py-1" title="Удалить">✕</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">Серверов нет</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>

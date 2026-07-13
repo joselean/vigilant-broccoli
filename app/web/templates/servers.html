@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Серверы — VDS Reseller{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">Серверы</h1>
+    <div class="flex gap-2">
+        <select name="provider" hx-get="/servers/" hx-target="#servers-table" hx-include="[name='status']"
+                class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="">Все провайдеры</option>
+            {% for p in providers %}
+            <option value="{{ p }}" {% if p == provider %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+        </select>
+        <select name="status" hx-get="/servers/" hx-target="#servers-table" hx-include="[name='provider']"
+                class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
+            <option value="">Все статусы</option>
+            {% for s in statuses %}
+            <option value="{{ s }}" {% if s == status %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+<div id="servers-table">
+    {% include "partials/servers_table.html" %}
+</div>
+{% endblock %}

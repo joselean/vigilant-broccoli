@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Дашборд — VDS Reseller{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-6">Дашборд</h1>
+
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow-sm p-5">
+        <div class="text-sm text-slate-500">Пользователей</div>
+        <div class="text-3xl font-bold mt-1">{{ users_count }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-5">
+        <div class="text-sm text-slate-500">Активных серверов</div>
+        <div class="text-3xl font-bold mt-1">{{ active_servers }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-5">
+        <div class="text-sm text-slate-500">Выручка за месяц</div>
+        <div class="text-3xl font-bold mt-1">{{ revenue_month | money }}</div>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-5">
+        <div class="text-sm text-slate-500">Прибыль за месяц</div>
+        <div class="text-3xl font-bold mt-1 {% if profit_month >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">
+            {{ profit_month | money }}
+        </div>
+        <div class="text-xs text-slate-400 mt-1">затраты на провайдеров: {{ provider_costs | money }}/мес</div>
+    </div>
+</div>
+
+<div class="bg-white rounded-xl shadow-sm p-6">
+    <h2 class="font-semibold mb-4">Выручка за 14 дней</h2>
+    <div class="flex items-end gap-1 h-48">
+        {% set max_val = chart_values | max %}
+        {% for value in chart_values %}
+        <div class="flex-1 flex flex-col items-center gap-1">
+            <div class="text-[10px] text-slate-500">{{ "%.0f" | format(value) }}</div>
+            <div class="w-full bg-indigo-500 rounded-t"
+                 style="height: {{ (value / max_val * 100) if max_val > 0 else 0 }}%"
+                 title="${{ '%.2f' | format(value) }}"></div>
+            <div class="text-[10px] text-slate-400 rotate-0">{{ chart_days[loop.index0] }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
